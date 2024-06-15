@@ -20,7 +20,7 @@ setting, since the cylinder's per-frame movement is usually very small.
 # Goal
 
 The goal of my implementation was to achieve 100µs/call for 16 triangles on a 3GHz CPU using AVX-2.
-The benchmark run in the usage example shows running times of ~7µs/call (this may of course vary on your machine!).
+The benchmark run in the usage example shows running times of ~6µs/call (this may of course vary on your machine!).
 
 # DISCLAIMER
 
