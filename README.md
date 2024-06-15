@@ -5,12 +5,17 @@ See his blog post here: https://caseymuratori.com/blog_0032. I recommend you wat
 # Setting
 The code deals with a very specific collision resolution problem.
 The method implemented here tries to resolve collisions of a cylinder against a triangle mesh.
-The cylinder is given an additional _leg_height_ and _head_height_ parameters that are typically
-used in video games to provide stair clipping.
+The cylinder is given an additional _leg_height_ and _head_height_ parameters. Leg heights are
+typically used in video games to provide stair/floor clipping. The head height does so symmetrically for ceilings.
 
-The implementation only attempts to find a new position where to place the cylinder.
-If no such position exists that is at most the cylinder's radius away from the target (in x,y), then
-no new position will be found.
+We only attempt to find a new valid position where to place the cylinder.
+There is no concept of moving geometry, i.e., you do not provide
+velocities for the cylinder/triangles, but just a list of triangles and a cylinder.
+
+Additionally, only a small region around the cylinder is searched for a valid position.
+In particular, the method returns whether no solution exists that is close to the target position
+(at most the cylinder radius away from the target in x,y). This is typically not an issue in a game
+setting, since the cylinder's per-frame movement is usually very small.
 
 # Goal
 
