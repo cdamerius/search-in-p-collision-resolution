@@ -1,23 +1,24 @@
 //Compile with:
 //g++-12 -mavx2 -s -flto -O3 -ftabstop=4 -Wno-maybe-uninitialized -Wno-uninitialized -o usage_example.out usage_example.cpp
 
+#include <iostream>
+
 #include "resolve_collision.hpp"
+#include "repetition_tester.cpp"
 
-#include <cstdio>
-
-void print_result(f32_4 target, Resolve_Collision_Result resolve_collision_result) {
-	printf("Attempting to move to (%f, %f, %f, %f).\n", target.x, target.y, target.z, target.w);
+void print_collision_resolve_result(f32_4 target, Resolve_Collision_Result resolve_collision_result) {
+	std::cout << "Attempting to move to (" << target.x << ", " << target.y << ", " << target.z << ", " << target.w << ").\n";
 	if (resolve_collision_result.found_new_pos) {
 		f32_4 new_pos = resolve_collision_result.new_pos;
-		printf("Found new position at (%f, %f, %f, %f).\n", new_pos.x, new_pos.y, new_pos.z, new_pos.w);
-		printf("Is the cylinder grounded? ");
+		std::cout << "Found new position at (" << new_pos.x << ", " << new_pos.y << ", " << new_pos.z << ", " << new_pos.w << ").\n";
+		std::cout << "Is the cylinder grounded? ";
 		if (resolve_collision_result.new_grounded) {
-			printf("yes.\n");
+			std::cout << "yes.\n";
 		} else {
-			printf("no.\n");
+			std::cout << "no.\n";
 		}
 	} else {
-		printf("No space to put cylinder to!\n");
+		std::cout << "No space to put cylinder to!\n";
 	}
 }
 
@@ -62,24 +63,19 @@ int main(int, char**) {
 	f32_4 target = {0.2f, 0.1f, -1.0f, 1.0f};
 
 	Resolve_Collision_Result resolve_collision_result = resolve_collision(cylinder, target, vertices_count, &vertices[0]);
-	print_result(target, resolve_collision_result);
-
+	print_collision_resolve_result(target, resolve_collision_result);
 
 	//Benchmark
-	u64 rdtsc_begin = rdtsc();
-	i32 exec_count = 40000;
-	for (i32 i = 0; i != exec_count; i++) {
+	Repetition_Tester tester;
+	i64 min_ms_to_spend = 1'000;
+	init(&tester, "resolve_collision", min_ms_to_spend);
+	while (is_testing(&tester)) {
+		begin_time(&tester);
 		resolve_collision_result = resolve_collision(cylinder, target, vertices_count, &vertices[0]);
+		end_time(&tester);
 	}
-	u64 rdtsc_end = rdtsc();
-
-	u64 cycles_total = rdtsc_end - rdtsc_begin;
-	f64 cycles_average = f64(cycles_total) / f64(exec_count);
-	u64 cycles_per_second = 3'000'000'000;
-	f64 microseconds_avg = cycles_average / f64(cycles_per_second / 1'000'000);
-
-	printf("Benchmark setting: Hot cache scenario (%d iterations), %d triangles, %lu CPU cycles per second.\n", exec_count, vertices_count / 3, cycles_per_second);
-	printf("Time per resolve_collision call: %f microseconds.\n", microseconds_avg);
+	std::cout << "\n";
+	print_results(&tester);
 
 	return 0;
 }

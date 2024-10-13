@@ -98,6 +98,10 @@ FORCE_INLINE u64 rdtsc() {
 	return result;
 }
 
+i64 get_rdtsc_timer_freq() {
+	return 3'000'000'000;//hardcoded timer frequency of 3 GHz
+}
+
 #undef FORCE_INLINE
 
 
